@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: midnight-validators
+  name: substrate-validators
   namespace: argocd
 spec:
   goTemplate: true
@@ -23,16 +23,16 @@ spec:
             autoSync: "false"
   template:
     metadata:
-      name: "midnight-{{.env}}"
+      name: "validator-{{.env}}"
     spec:
-      project: midnight-validators
+      project: substrate-validators
       source:
-        repoURL: https://github.com/Kamrank47/midnight-validator-platform.git
+        repoURL: https://github.com/Kamrank47/substrate-validator-ops.git
         targetRevision: main
         path: "{{.path}}"
       destination:
         server: "{{.cluster}}"
-        namespace: midnight-validator
+        namespace: validator-ops
       syncPolicy:
         syncOptions:
           - CreateNamespace=true

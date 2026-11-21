@@ -10,9 +10,9 @@ terraform {
 }
 
 locals {
-  name_prefix = "midnight-${var.network}-${var.operator_role}"
+  name_prefix = "validator-${var.network}-${var.operator_role}"
   common_tags = merge(var.tags, {
-    Project   = "midnight-validator-platform"
+    Project   = "substrate-validator-ops"
     Network   = var.network
     Operator  = var.operator_role
     ManagedBy = "OpenTofu"
@@ -89,7 +89,7 @@ resource "aws_route_table_association" "sentry_public" {
 # Only libp2p port 30333 is open to 0.0.0.0/0. RPC (9944) and Prometheus (9615) stay internal.
 resource "aws_security_group" "validator" {
   name        = "${local.name_prefix}-sg"
-  description = "Midnight validator: P2P 30333 public via NLB; RPC 9944 and metrics 9615 restricted"
+  description = "Substrate validator: P2P 30333 public via NLB; RPC 9944 and metrics 9615 restricted"
   vpc_id      = aws_vpc.this.id
 
   ingress {
@@ -193,7 +193,7 @@ resource "aws_ebs_volume" "chain_state" {
 
 resource "aws_secretsmanager_secret" "validator_keystore" {
   name                    = "${local.name_prefix}-session-keystore"
-  description             = "Reference secret storing encrypted Midnight Aura/Grandpa session keys (populated out-of-band)"
+  description             = "Reference secret storing encrypted Substrate Aura/Grandpa session keys (populated out-of-band)"
   kms_key_id              = aws_kms_key.chain_state.arn
   recovery_window_in_days = 14
 
@@ -280,8 +280,8 @@ resource "aws_launch_template" "validator" {
   user_data = base64encode(<<-EOF
     #!/usr/bin/env bash
     set -euo pipefail
-    echo "MIDNIGHT_NETWORK=${var.network}" >> /etc/environment
-    echo "MIDNIGHT_OPERATOR_ROLE=${var.operator_role}" >> /etc/environment
+    echo "CHAIN_NETWORK=${var.network}" >> /etc/environment
+    echo "OPERATOR_ROLE=${var.operator_role}" >> /etc/environment
     echo "KEYSTORE_SECRET_ARN=${aws_secretsmanager_secret.validator_keystore.arn}" >> /etc/environment
   EOF
   )

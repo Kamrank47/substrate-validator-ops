@@ -12,8 +12,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Kamrank47/midnight-validator-platform/telemetry/internal/etl"
-	"github.com/Kamrank47/midnight-validator-platform/telemetry/internal/probe"
+	"github.com/Kamrank47/substrate-validator-ops/telemetry/internal/etl"
+	"github.com/Kamrank47/substrate-validator-ops/telemetry/internal/probe"
 )
 
 type configFile struct {
@@ -249,6 +249,6 @@ func main() {
 		}
 	}()
 
-	log.Printf("Serving Midnight validator ETL exporter on %s", *serveAddr)
+	log.Printf("Serving Substrate validator ETL exporter on %s", *serveAddr)
 	log.Fatal(http.ListenAndServe(*serveAddr, mux))
 }

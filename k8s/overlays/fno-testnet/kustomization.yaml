@@ -4,7 +4,7 @@ resources:
   - ../../base
 namePrefix: fno-
 commonLabels:
-  midnight.network/env: testnet
-  midnight.network/operator: fno
+  validator.ops/env: testnet
+  validator.ops/operator: fno
 patches:
   - path: patch-fno.yaml

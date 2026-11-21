@@ -63,10 +63,10 @@ func mockValidatorServers(t *testing.T, peers int, isSyncing bool, headerHex str
 func TestParsePrometheusText(t *testing.T) {
 	raw := `
 # HELP substrate_block_height Current block height
-substrate_block_height{status="best",chain="midnight_mainnet"} 120050
-substrate_block_height{status="finalized",chain="midnight_mainnet"} 120048
-substrate_sub_libp2p_peers_count{chain="midnight_mainnet"} 42
-substrate_proposer_block_constructed_count{chain="midnight_mainnet"} 819
+substrate_block_height{status="best",chain="substrate_mainnet"} 120050
+substrate_block_height{status="finalized",chain="substrate_mainnet"} 120048
+substrate_sub_libp2p_peers_count{chain="substrate_mainnet"} 42
+substrate_proposer_block_constructed_count{chain="substrate_mainnet"} 819
 `
 	m, err := ParsePrometheusText(raw)
 	if err != nil {

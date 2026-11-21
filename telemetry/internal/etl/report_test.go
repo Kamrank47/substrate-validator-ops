@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Kamrank47/midnight-validator-platform/telemetry/internal/probe"
+	"github.com/Kamrank47/substrate-validator-ops/telemetry/internal/probe"
 )
 
 func TestBuildMonthlyReportSLO(t *testing.T) {

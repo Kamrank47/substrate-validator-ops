@@ -9,6 +9,6 @@ output "gcp_chain_disk_id" {
 }
 
 output "gcp_keystore_secret_id" {
-  description = "GCP Secret Manager ID for Midnight session keystore"
+  description = "GCP Secret Manager ID for Substrate session keystore"
   value       = google_secret_manager_secret.validator_keystore.secret_id
 }

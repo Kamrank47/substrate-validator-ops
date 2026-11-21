@@ -24,9 +24,9 @@ services:
       retries: 5
       start_period: 45s
 
-  midnight-node:
-    image: midnightntwrk/midnight-node:latest
-    container_name: midnight-spo-validator
+  substrate-validator:
+    image: parity/substrate:latest
+    container_name: substrate-spo-validator
     depends_on:
       cardano-node:
         condition: service_healthy
@@ -54,15 +54,15 @@ services:
       - "--prometheus-port=9615"
       - "--prometheus-external"
     volumes:
-      - /var/lib/midnight/chain-data:/chain-data
+      - /var/lib/validator/chain-data:/chain-data
       - /var/run/cardano-ipc:/ipc:ro
-      - /etc/midnight/keystore:/keystore:ro
+      - /etc/validator/keystore:/keystore:ro
     tmpfs:
       - /tmp
 
   node-exporter:
     image: quay.io/prometheus/node-exporter:v1.8.2
-    container_name: midnight-spo-node-exporter
+    container_name: validator-spo-node-exporter
     restart: unless-stopped
     network_mode: host
     pid: host

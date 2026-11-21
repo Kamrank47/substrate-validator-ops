@@ -1,26 +1,26 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: midnight-node
-  namespace: midnight-validator
+  name: substrate-validator
+  namespace: validator-ops
   labels:
-    app.kubernetes.io/name: midnight-node
-    app.kubernetes.io/part-of: midnight-validator-platform
+    app.kubernetes.io/name: substrate-validator
+    app.kubernetes.io/part-of: substrate-validator-ops
     slo-tier: "99.99"
 spec:
-  serviceName: midnight-node-internal
+  serviceName: substrate-validator-internal
   replicas: 1
   podManagementPolicy: OrderedReady
   updateStrategy:
     type: RollingUpdate
   selector:
     matchLabels:
-      app.kubernetes.io/name: midnight-node
+      app.kubernetes.io/name: substrate-validator
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: midnight-node
-        app.kubernetes.io/part-of: midnight-validator-platform
+        app.kubernetes.io/name: substrate-validator
+        app.kubernetes.io/part-of: substrate-validator-ops
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "9615"
@@ -43,11 +43,11 @@ spec:
                     - key: app.kubernetes.io/name
                       operator: In
                       values:
-                        - midnight-node
+                        - substrate-validator
                 topologyKey: kubernetes.io/hostname
       containers:
-        - name: midnight-node
-          image: midnightntwrk/midnight-node:latest
+        - name: substrate-validator
+          image: parity/substrate:latest
           imagePullPolicy: IfNotPresent
           args:
             - --validator

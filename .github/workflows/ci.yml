@@ -79,7 +79,7 @@ jobs:
         run: |
           bash -n bare-metal/scripts/*.sh
           DRY_RUN=true ./bare-metal/scripts/harden-validator-host.sh
-          DRY_RUN=true ./bare-metal/scripts/rolling-upgrade.sh midnightntwrk/midnight-node:latest
+          DRY_RUN=true ./bare-metal/scripts/rolling-upgrade.sh parity/substrate:latest
       - name: Validate all JSON and YAML files
         run: |
           python3 -m pip install --quiet pyyaml

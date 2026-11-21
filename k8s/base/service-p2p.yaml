@@ -1,15 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: midnight-node-p2p
-  namespace: midnight-validator
+  name: substrate-validator-p2p
+  namespace: validator-ops
   labels:
-    app.kubernetes.io/name: midnight-node
+    app.kubernetes.io/name: substrate-validator
 spec:
   type: LoadBalancer
   externalTrafficPolicy: Local
   selector:
-    app.kubernetes.io/name: midnight-node
+    app.kubernetes.io/name: substrate-validator
   ports:
     - name: p2p
       port: 30333

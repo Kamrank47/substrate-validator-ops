@@ -25,7 +25,7 @@ const (
 	StatusUnreachable Status = "unreachable"
 )
 
-// Target defines a Midnight validator RPC + Prometheus metrics endpoint pair.
+// Target defines a Substrate validator RPC + Prometheus metrics endpoint pair.
 type Target struct {
 	Name           string `json:"name"`
 	OperatorType   string `json:"operator_type"` // "fno" or "spo"
@@ -37,7 +37,7 @@ type Target struct {
 	MaxFinalityLag uint64 `json:"max_finality_lag"`
 }
 
-// Snapshot captures a single synchronized observation of a Midnight validator.
+// Snapshot captures a single synchronized observation of a Substrate validator.
 type Snapshot struct {
 	Target          Target    `json:"target"`
 	Timestamp       time.Time `json:"timestamp"`
@@ -255,7 +255,7 @@ func (p *Prober) callChainHeader(ctx context.Context, rpcURL string) (uint64, er
 	return strconv.ParseUint(trimmed, 16, 64)
 }
 
-// SubstrateMetrics holds core Prometheus metrics exposed by substrate/midnight-node on :9615.
+// SubstrateMetrics holds core Prometheus metrics exposed by substrate/substrate-validator on :9615.
 type SubstrateMetrics struct {
 	BestHeight      uint64
 	FinalizedHeight uint64

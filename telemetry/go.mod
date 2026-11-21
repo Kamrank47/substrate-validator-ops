@@ -1,3 +1,3 @@
-module github.com/Kamrank47/midnight-validator-platform/telemetry
+module github.com/Kamrank47/substrate-validator-ops/telemetry
 
 go 1.22

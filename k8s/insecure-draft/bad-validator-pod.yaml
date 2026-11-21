@@ -6,23 +6,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: midnight-node-unsafe
-  namespace: midnight-validator
+  name: substrate-validator-unsafe
+  namespace: validator-ops
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: midnight-node-unsafe
+      app: substrate-validator-unsafe
   template:
     metadata:
       labels:
-        app: midnight-node-unsafe
+        app: substrate-validator-unsafe
     spec:
       securityContext:
         runAsNonRoot: false
       containers:
-        - name: midnight-node
-          image: midnightntwrk/midnight-node:latest
+        - name: substrate-validator
+          image: parity/substrate:latest
           securityContext:
             allowPrivilegeEscalation: true
             readOnlyRootFilesystem: false
@@ -32,12 +32,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: midnight-node-public-rpc
-  namespace: midnight-validator
+  name: substrate-validator-public-rpc
+  namespace: validator-ops
 spec:
   type: LoadBalancer
   selector:
-    app: midnight-node-unsafe
+    app: substrate-validator-unsafe
   ports:
     - name: rpc
       port: 9944

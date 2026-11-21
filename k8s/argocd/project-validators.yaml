@@ -1,14 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: midnight-validators
+  name: substrate-validators
   namespace: argocd
 spec:
-  description: GitOps boundary for Midnight FNO and SPO validator clusters
+  description: GitOps boundary for Substrate FNO and SPO validator clusters
   sourceRepos:
-    - https://github.com/Kamrank47/midnight-validator-platform.git
+    - https://github.com/Kamrank47/substrate-validator-ops.git
   destinations:
-    - namespace: midnight-validator
+    - namespace: validator-ops
       server: "*"
   clusterResourceWhitelist:
     - group: ""

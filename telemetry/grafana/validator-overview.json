@@ -1,10 +1,10 @@
 {
-  "title": "Midnight Validator Operations & 99.99% SLO Overview",
-  "uid": "midnight-validator-ops",
+  "title": "Substrate Validator Operations & 99.99% SLO Overview",
+  "uid": "substrate-validator-ops",
   "schemaVersion": 39,
   "version": 1,
   "refresh": "15s",
-  "tags": ["midnight", "blockchain", "validator", "slo"],
+  "tags": ["substrate", "blockchain", "validator", "slo"],
   "time": {
     "from": "now-6h",
     "to": "now"
@@ -15,14 +15,14 @@
       "type": "stat",
       "title": "Validator Reachability (1 = Up)",
       "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
-      "targets": [{ "expr": "midnight_validator_up", "refId": "A" }]
+      "targets": [{ "expr": "validator_ops_up", "refId": "A" }]
     },
     {
       "id": 2,
       "type": "stat",
       "title": "30d Error Budget Remaining (Min @ 99.99%)",
       "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
-      "targets": [{ "expr": "midnight_validator_error_budget_remaining_minutes", "refId": "A" }]
+      "targets": [{ "expr": "validator_ops_error_budget_remaining_minutes", "refId": "A" }]
     },
     {
       "id": 3,
@@ -40,8 +40,8 @@
       "title": "Finality Lag & Libp2p Peer Count",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
       "targets": [
-        { "expr": "midnight_validator_finality_lag", "legendFormat": "Lag - {{validator}}", "refId": "A" },
-        { "expr": "midnight_validator_peers", "legendFormat": "Peers - {{validator}}", "refId": "B" }
+        { "expr": "validator_ops_finality_lag", "legendFormat": "Lag - {{validator}}", "refId": "A" },
+        { "expr": "validator_ops_peers", "legendFormat": "Peers - {{validator}}", "refId": "B" }
       ]
     },
     {

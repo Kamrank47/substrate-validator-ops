@@ -10,7 +10,7 @@ terraform {
 }
 
 locals {
-  name_prefix = "midnight-${var.network}-${var.operator_role}"
+  name_prefix = "validator-${var.network}-${var.operator_role}"
 }
 
 resource "google_compute_network" "vpc" {
@@ -32,7 +32,7 @@ resource "google_compute_firewall" "p2p_ingress" {
 
   direction     = "INGRESS"
   source_ranges = ["0.0.0.0/0"]
-  target_tags   = ["midnight-validator"]
+  target_tags   = ["validator-ops"]
 
   allow {
     protocol = "tcp"
@@ -46,7 +46,7 @@ resource "google_compute_firewall" "internal_ops_metrics" {
 
   direction     = "INGRESS"
   source_ranges = var.ops_monitoring_cidrs
-  target_tags   = ["midnight-validator"]
+  target_tags   = ["validator-ops"]
 
   allow {
     protocol = "tcp"
@@ -76,7 +76,7 @@ resource "google_compute_disk" "chain_state" {
   }
 
   labels = {
-    project  = "midnight-validator-platform"
+    project  = "substrate-validator-ops"
     network  = var.network
     operator = var.operator_role
   }
@@ -84,7 +84,7 @@ resource "google_compute_disk" "chain_state" {
 
 resource "google_service_account" "validator" {
   account_id   = substr("${local.name_prefix}-sa", 0, 28)
-  display_name = "Midnight Validator Service Account (${var.network})"
+  display_name = "Substrate Validator Service Account (${var.network})"
 }
 
 resource "google_secret_manager_secret" "validator_keystore" {
@@ -98,7 +98,7 @@ resource "google_secret_manager_secret" "validator_keystore" {
 resource "google_compute_instance_template" "validator" {
   name_prefix  = "${local.name_prefix}-tpl-"
   machine_type = var.machine_type
-  tags         = ["midnight-validator", var.operator_role]
+  tags         = ["validator-ops", var.operator_role]
 
   shielded_instance_config {
     enable_secure_boot          = true
@@ -129,7 +129,7 @@ resource "google_compute_instance_template" "validator" {
 
   metadata = {
     enable-oslogin     = "TRUE"
-    midnight-network   = var.network
+    chain-network      = var.network
     operator-role      = var.operator_role
     keystore-secret-id = google_secret_manager_secret.validator_keystore.secret_id
     block-project-ssh  = "TRUE"

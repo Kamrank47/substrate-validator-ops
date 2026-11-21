@@ -7,7 +7,7 @@ variable "validator_session_key_mnemonic" {
 }
 
 resource "aws_security_group" "unsafe_validator" {
-  name        = "unsafe-midnight-validator-sg"
+  name        = "unsafe-substrate-validator-sg"
   description = "EXPOSED ports fixture for policy testing"
 
   ingress {

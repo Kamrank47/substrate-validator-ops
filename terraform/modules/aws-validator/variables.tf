@@ -1,6 +1,6 @@
 variable "network" {
   type        = string
-  description = "Midnight network name (devnet, testnet, mainnet)"
+  description = "Substrate network name (devnet, testnet, mainnet)"
 }
 
 variable "operator_role" {
@@ -30,7 +30,7 @@ variable "ami_id" {
 
 variable "instance_type" {
   type        = string
-  description = "EC2 instance type sized for Midnight node + optional Cardano partner-chain follower"
+  description = "EC2 instance type sized for Substrate node + optional Cardano partner-chain follower"
   default     = "c6i.2xlarge"
 }
 

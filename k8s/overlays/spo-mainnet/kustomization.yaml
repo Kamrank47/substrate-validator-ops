@@ -4,7 +4,7 @@ resources:
   - ../../base
 namePrefix: spo-
 commonLabels:
-  midnight.network/env: mainnet
-  midnight.network/operator: spo
+  validator.ops/env: mainnet
+  validator.ops/operator: spo
 patches:
   - path: patch-spo-partner-chain.yaml

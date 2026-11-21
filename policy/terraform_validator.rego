@@ -2,7 +2,7 @@ package main
 
 import rego.v1
 
-# Enforce Midnight validator IaC security baselines on HCL2 Terraform/OpenTofu files.
+# Enforce Substrate validator IaC security baselines on HCL2 Terraform/OpenTofu files.
 # Blocks exposed RPC (9944), Prometheus (9615), SSH (22), unencrypted chain storage,
 # missing IMDSv2 enforcement, and literal private keys/mnemonics in config.
 

@@ -1,15 +1,15 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: midnight-node-metrics
-  namespace: midnight-validator
+  name: substrate-validator-metrics
+  namespace: validator-ops
   labels:
-    app.kubernetes.io/name: midnight-node
+    app.kubernetes.io/name: substrate-validator
     release: prometheus
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: midnight-node
+      app.kubernetes.io/name: substrate-validator
   endpoints:
     - port: metrics
       path: /metrics

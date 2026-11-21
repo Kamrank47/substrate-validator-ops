@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Kamrank47/midnight-validator-platform/telemetry/internal/probe"
+	"github.com/Kamrank47/substrate-validator-ops/telemetry/internal/probe"
 )
 
 const SLOTargetPercent = 99.99
@@ -157,7 +157,7 @@ func RenderJSON(report MonthlyReport) ([]byte, error) {
 // RenderMarkdown formats an operator-ready monthly FNO/SPO telemetry & SLO report.
 func RenderMarkdown(report MonthlyReport) string {
 	var b strings.Builder
-	fmt.Fprintf(&b, "# Midnight Monthly Validator Operations Report (%s)\n\n", report.Network)
+	fmt.Fprintf(&b, "# Substrate Validator Monthly Operations Report (%s)\n\n", report.Network)
 	fmt.Fprintf(&b, "- **Generated:** %s\n", report.GeneratedAt.Format(time.RFC3339))
 	fmt.Fprintf(&b, "- **Window:** %d days | **SLO Target:** %.2f%% (Monthly Error Budget: %.2f min)\n",
 		report.WindowDays, report.SLOTargetPercent, report.ErrorBudgetTotalMinutes)
@@ -192,35 +192,35 @@ func RenderMarkdown(report MonthlyReport) string {
 // RenderPrometheusMetrics exposes live validator probes and SLO budget gauges in Prometheus text format.
 func RenderPrometheusMetrics(snapshots []probe.Snapshot, report MonthlyReport) string {
 	var b strings.Builder
-	b.WriteString("# HELP midnight_validator_up Validator reachability (1=up, 0=unreachable)\n")
-	b.WriteString("# TYPE midnight_validator_up gauge\n")
+	b.WriteString("# HELP validator_ops_up Validator reachability (1=up, 0=unreachable)\n")
+	b.WriteString("# TYPE validator_ops_up gauge\n")
 	for _, s := range snapshots {
 		up := 0
 		if s.Reachable {
 			up = 1
 		}
-		fmt.Fprintf(&b, "midnight_validator_up{validator=%q,operator=%q,cloud=%q,region=%q} %d\n",
+		fmt.Fprintf(&b, "validator_ops_up{validator=%q,operator=%q,cloud=%q,region=%q} %d\n",
 			s.Target.Name, s.Target.OperatorType, s.Target.Cloud, s.Target.Region, up)
 	}
 
-	b.WriteString("# HELP midnight_validator_finality_lag Blocks between best and finalized head\n")
-	b.WriteString("# TYPE midnight_validator_finality_lag gauge\n")
+	b.WriteString("# HELP validator_ops_finality_lag Blocks between best and finalized head\n")
+	b.WriteString("# TYPE validator_ops_finality_lag gauge\n")
 	for _, s := range snapshots {
-		fmt.Fprintf(&b, "midnight_validator_finality_lag{validator=%q,operator=%q} %d\n",
+		fmt.Fprintf(&b, "validator_ops_finality_lag{validator=%q,operator=%q} %d\n",
 			s.Target.Name, s.Target.OperatorType, s.FinalityLag)
 	}
 
-	b.WriteString("# HELP midnight_validator_peers Active libp2p peers reported by validator\n")
-	b.WriteString("# TYPE midnight_validator_peers gauge\n")
+	b.WriteString("# HELP validator_ops_peers Active libp2p peers reported by validator\n")
+	b.WriteString("# TYPE validator_ops_peers gauge\n")
 	for _, s := range snapshots {
-		fmt.Fprintf(&b, "midnight_validator_peers{validator=%q,operator=%q} %d\n",
+		fmt.Fprintf(&b, "validator_ops_peers{validator=%q,operator=%q} %d\n",
 			s.Target.Name, s.Target.OperatorType, s.Libp2pPeers)
 	}
 
-	b.WriteString("# HELP midnight_validator_error_budget_remaining_minutes Monthly 99.99% SLO error budget remaining in minutes\n")
-	b.WriteString("# TYPE midnight_validator_error_budget_remaining_minutes gauge\n")
+	b.WriteString("# HELP validator_ops_error_budget_remaining_minutes Monthly 99.99% SLO error budget remaining in minutes\n")
+	b.WriteString("# TYPE validator_ops_error_budget_remaining_minutes gauge\n")
 	for _, op := range report.Operators {
-		fmt.Fprintf(&b, "midnight_validator_error_budget_remaining_minutes{validator=%q,operator=%q} %.2f\n",
+		fmt.Fprintf(&b, "validator_ops_error_budget_remaining_minutes{validator=%q,operator=%q} %.2f\n",
 			op.Name, op.OperatorType, op.ErrorBudgetRemainingMinutes)
 	}
 	return b.String()

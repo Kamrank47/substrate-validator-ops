@@ -10,7 +10,7 @@ variable "aws_ami_id" {
 
 variable "gcp_project" {
   type    = string
-  default = "midnight-testnet-ops"
+  default = "validator-testnet-ops"
 }
 
 variable "gcp_region" {

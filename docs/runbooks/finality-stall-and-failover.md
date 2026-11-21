@@ -1,6 +1,6 @@
 # Runbook: Finality Stall & Zero-Equivocation Validator Failover
 
-**Alerts Covered:** `MidnightValidatorFinalizedHeadStalled`, `MidnightValidatorSLOFastBurn`, `MidnightValidatorFinalityLagHigh`
+**Alerts Covered:** `ValidatorFinalizedHeadStalled`, `ValidatorSLOFastBurn`, `ValidatorFinalityLagHigh`
 
 **SLO Context:** Maintaining **99.99%** monthly availability leaves only **4.32 minutes/month** of total downtime error budget. Never rush a failover at the expense of double-signing.
 
@@ -28,7 +28,7 @@
 
 **NEVER start session signing on a standby validator until ALL four checks pass:**
 
-- [ ] Confirm primary `midnight-node` systemd unit / container / pod is **completely terminated** (`systemctl is-active midnight-node` -> `inactive`, `pgrep -xc midnight-node` -> `0`, or K8s pod fully gone — not `Terminating`).
+- [ ] Confirm primary `substrate-validator` systemd unit / container / pod is **completely terminated** (`systemctl is-active substrate-validator` -> `inactive`, `pgrep -xc substrate-validator` -> `0`, or K8s pod fully gone — not `Terminating`).
 - [ ] Verify network/NLB detachment or node deletion has completed cleanly (wait at least 15s past process termination).
 - [ ] Confirm standby node chain database is fully synced (`isSyncing: false`) and Cardano IPC socket is healthy (for SPOs).
 - [ ] Promote standby **without** sharing the same session key concurrently, rotate session keys cleanly on-chain afterward if key exposure is suspected, and annotate the promotion in the monthly ETL incident list.

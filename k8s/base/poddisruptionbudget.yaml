@@ -1,10 +1,10 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: midnight-node-pdb
-  namespace: midnight-validator
+  name: substrate-validator-pdb
+  namespace: validator-ops
 spec:
   minAvailable: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: midnight-node
+      app.kubernetes.io/name: substrate-validator

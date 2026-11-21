@@ -1,5 +1,5 @@
 {
-  description = "Reproducible Midnight validator operations, IaC, and telemetry toolchain";
+  description = "Reproducible Substrate validator operations, IaC, and telemetry toolchain";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -26,7 +26,7 @@
           ];
 
           shellHook = ''
-            echo "Midnight Validator Ops shell ready (OpenTofu, kubectl, Conftest, Go, Prometheus, ShellCheck)."
+            echo "Substrate Validator Ops shell ready (OpenTofu, kubectl, Conftest, Go, Prometheus, ShellCheck)."
           '';
         };
       });

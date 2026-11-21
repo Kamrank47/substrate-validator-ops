@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: midnight-node
-  namespace: midnight-validator
+  name: substrate-validator
+  namespace: validator-ops
 spec:
   template:
     metadata:
       labels:
-        midnight.network/operator: fno
+        validator.ops/operator: fno
     spec:
       containers:
-        - name: midnight-node
+        - name: substrate-validator
           args:
             - --validator
             - --chain=testnet

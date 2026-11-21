@@ -1,18 +1,18 @@
 [Unit]
-Description=Midnight Validator Node (Partner Chain)
-Documentation=https://github.com/Kamrank47/midnight-validator-platform
+Description=Substrate Validator Node (Partner Chain)
+Documentation=https://github.com/Kamrank47/substrate-validator-ops
 After=network-online.target chronyd.service
 Wants=network-online.target
 
 [Service]
 Type=simple
-User=midnight
-Group=midnight
-EnvironmentFile=/etc/midnight/validator.env
-ExecStart=/usr/local/bin/midnight-node \
+User=validator
+Group=validator
+EnvironmentFile=/etc/validator/validator.env
+ExecStart=/usr/local/bin/substrate-validator \
   --validator \
-  --base-path=/var/lib/midnight/chain-data \
-  --keystore-path=/etc/midnight/keystore \
+  --base-path=/var/lib/validator/chain-data \
+  --keystore-path=/etc/validator/keystore \
   --port=30333 \
   --rpc-port=9944 \
   --rpc-methods=Safe \
@@ -27,15 +27,15 @@ NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectSystem=strict
 ProtectHome=yes
-ReadWritePaths=/var/lib/midnight/chain-data
-ReadOnlyPaths=/etc/midnight/keystore
+ReadWritePaths=/var/lib/validator/chain-data
+ReadOnlyPaths=/etc/validator/keystore
 ProtectKernelTunables=yes
 ProtectControlGroups=yes
 RestrictSUIDSGID=yes
 
 StandardOutput=journal
 StandardError=journal
-SyslogIdentifier=midnight-node
+SyslogIdentifier=substrate-validator
 
 [Install]
 WantedBy=multi-user.target

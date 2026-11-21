@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Hardens a bare-metal Linux host running a Midnight FNO or SPO validator.
+# Hardens a bare-metal Linux host running a Substrate FNO or SPO validator.
 # Enforces P2P-only public firewall, internal WireGuard/monitoring ACLs,
 # kernel sysctl tuning, NTP clock drift guard, and strict 0600 keystore perms.
 
 OPS_VPN_CIDR="${OPS_VPN_CIDR:-10.99.0.0/24}"
 MONITORING_CIDR="${MONITORING_CIDR:-10.42.0.0/16}"
-KEYSTORE_DIR="${KEYSTORE_DIR:-/etc/midnight/keystore}"
-DATA_DIR="${DATA_DIR:-/var/lib/midnight/chain-data}"
+KEYSTORE_DIR="${KEYSTORE_DIR:-/etc/validator/keystore}"
+DATA_DIR="${DATA_DIR:-/var/lib/validator/chain-data}"
 DRY_RUN="${DRY_RUN:-false}"
 
 log() {
@@ -38,15 +38,15 @@ configure_firewall() {
   log "Configuring UFW: expose 30333/tcp only; restrict RPC 9944 and Prometheus 9615"
   run_cmd ufw default deny incoming
   run_cmd ufw default allow outgoing
-  run_cmd ufw allow 30333/tcp comment 'Midnight libp2p P2P'
-  run_cmd ufw allow from "$OPS_VPN_CIDR" to any port 9944 proto tcp comment 'Midnight internal RPC'
-  run_cmd ufw allow from "$MONITORING_CIDR" to any port 9615 proto tcp comment 'Midnight Prometheus metrics'
+  run_cmd ufw allow 30333/tcp comment 'Substrate libp2p P2P'
+  run_cmd ufw allow from "$OPS_VPN_CIDR" to any port 9944 proto tcp comment 'Substrate internal RPC'
+  run_cmd ufw allow from "$MONITORING_CIDR" to any port 9615 proto tcp comment 'Substrate Prometheus metrics'
   run_cmd ufw allow from "$OPS_VPN_CIDR" to any port 22 proto tcp comment 'Bastion SSH via VPN only'
   run_cmd ufw --force enable
 }
 
 configure_sysctl() {
-  local sysctl_file="/etc/sysctl.d/99-midnight-validator.conf"
+  local sysctl_file="/etc/sysctl.d/99-validator-ops.conf"
   log "Applying validator TCP/BBR and RocksDB file-descriptor sysctl tuning -> $sysctl_file"
   if [[ "$DRY_RUN" == "true" ]]; then
     return 0
@@ -75,8 +75,8 @@ secure_keystore_perms() {
   log "Ensuring keystore ($KEYSTORE_DIR) and chain-data ($DATA_DIR) ownership & strict permissions"
   run_cmd mkdir -p "$KEYSTORE_DIR" "$DATA_DIR"
   run_cmd chmod 0700 "$KEYSTORE_DIR"
-  if [[ "$DRY_RUN" != "true" ]] && id midnight >/dev/null 2>&1; then
-    chown -R midnight:midnight "$KEYSTORE_DIR" "$DATA_DIR"
+  if [[ "$DRY_RUN" != "true" ]] && id validator >/dev/null 2>&1; then
+    chown -R validator:validator "$KEYSTORE_DIR" "$DATA_DIR"
     find "$KEYSTORE_DIR" -type f -exec chmod 0600 {} +
   fi
 }

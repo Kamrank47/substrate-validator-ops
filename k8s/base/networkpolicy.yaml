@@ -1,12 +1,12 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: midnight-node-isolation
-  namespace: midnight-validator
+  name: substrate-validator-isolation
+  namespace: validator-ops
 spec:
   podSelector:
     matchLabels:
-      app.kubernetes.io/name: midnight-node
+      app.kubernetes.io/name: substrate-validator
   policyTypes:
     - Ingress
   ingress:

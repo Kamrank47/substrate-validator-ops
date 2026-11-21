@@ -2,7 +2,7 @@ package main
 
 import rego.v1
 
-# Enforce Midnight validator Kubernetes manifest guardrails.
+# Enforce Substrate validator Kubernetes manifest guardrails.
 # Requires StatefulSet (never Deployment), non-root + read-only rootfs,
 # liveness/readiness probes, and blocks LoadBalancer/NodePort exposure of 9944 or 9615.
 
@@ -14,8 +14,8 @@ restricted_ports := {22, 9615, 9944}
 
 deny contains msg if {
 	input.kind == "Deployment"
-	contains(lower(input.metadata.name), "midnight-node")
-	msg := sprintf("Deployment/%s: Midnight validators hold persistent chain state and identity and must use StatefulSet, not Deployment", [input.metadata.name])
+	contains(lower(input.metadata.name), "substrate-validator")
+	msg := sprintf("Deployment/%s: Substrate validators hold persistent chain state and identity and must use StatefulSet, not Deployment", [input.metadata.name])
 }
 
 # Inspect PodSpec across StatefulSet and Deployment

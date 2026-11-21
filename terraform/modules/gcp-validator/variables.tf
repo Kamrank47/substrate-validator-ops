@@ -1,6 +1,6 @@
 variable "network" {
   type        = string
-  description = "Midnight network name (devnet, testnet, mainnet)"
+  description = "Substrate network name (devnet, testnet, mainnet)"
 }
 
 variable "operator_role" {

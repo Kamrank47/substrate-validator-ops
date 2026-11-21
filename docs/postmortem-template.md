@@ -9,7 +9,7 @@
 One-paragraph objective overview of customer/validator impact, finality lag, or missed slots.
 
 ## Timeline (UTC)
-- `HH:MM` Alert `MidnightValidatorFinalizedHeadStalled` fired in Prometheus.
+- `HH:MM` Alert `ValidatorFinalizedHeadStalled` fired in Prometheus.
 - `HH:MM` On-call confirmed root cause and executed anti-equivocation verification.
 - `HH:MM` Mitigation complete; finalized block height resumed advancing.
 

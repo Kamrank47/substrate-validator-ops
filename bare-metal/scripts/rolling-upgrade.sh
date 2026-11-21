@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Zero-equivocation rolling upgrade script for bare-metal Midnight validators.
+# Zero-equivocation rolling upgrade script for bare-metal Substrate validators.
 # Verifies chain sync, ensures no duplicate signer exists before swap, records
 # pre-upgrade finalized head, rolls container/unit, and verifies finality advancement.
 
 TARGET_IMAGE="${1:-}"
-COMPOSE_FILE="${COMPOSE_FILE:-/etc/midnight/docker-compose.yml}"
+COMPOSE_FILE="${COMPOSE_FILE:-/etc/validator/docker-compose.yml}"
 RPC_URL="${RPC_URL:-http://127.0.0.1:9944}"
 METRICS_URL="${METRICS_URL:-http://127.0.0.1:9615/metrics}"
-ROLLBACK_IMAGE_FILE="/var/lib/midnight/.last_good_image"
+ROLLBACK_IMAGE_FILE="/var/lib/validator/.last_good_image"
 DRY_RUN="${DRY_RUN:-false}"
 
 log() {
@@ -22,7 +22,7 @@ die() {
 }
 
 if [[ -z "$TARGET_IMAGE" ]]; then
-  die "Usage: $0 <midnight-node-image:tag-or-digest>"
+  die "Usage: $0 <substrate-validator-image:tag-or-digest>"
 fi
 
 check_pre_upgrade_health() {
@@ -40,14 +40,14 @@ check_pre_upgrade_health() {
 }
 
 assert_single_signer() {
-  # Anti-equivocation check: refuse upgrade if duplicate midnight-node processes are running.
+  # Anti-equivocation check: refuse upgrade if duplicate substrate-validator processes are running.
   local count
-  count="$(pgrep -xc midnight-node 2>/dev/null || true)"
+  count="$(pgrep -xc substrate-validator 2>/dev/null || true)"
   count="${count:-0}"
   if [[ "$count" -gt 1 ]]; then
-    die "Multiple midnight-node processes detected ($count). Refusing upgrade to prevent equivocation."
+    die "Multiple substrate-validator processes detected ($count). Refusing upgrade to prevent equivocation."
   fi
-  log "Anti-double-signing check passed (active midnight-node process count: $count)."
+  log "Anti-double-signing check passed (active substrate-validator process count: $count)."
 }
 
 get_finalized_height() {
@@ -69,14 +69,14 @@ perform_upgrade() {
   fi
 
   local current_image
-  current_image="$(docker compose -f "$COMPOSE_FILE" images -q midnight-node 2>/dev/null || true)"
+  current_image="$(docker compose -f "$COMPOSE_FILE" images -q substrate-validator 2>/dev/null || true)"
   if [[ -n "$current_image" ]]; then
     echo "$current_image" >"$ROLLBACK_IMAGE_FILE"
   fi
 
   # Clean stop before bringing replacement online prevents two instances signing same slot.
-  docker compose -f "$COMPOSE_FILE" stop -t 60 midnight-node
-  MIDNIGHT_IMAGE="$TARGET_IMAGE" docker compose -f "$COMPOSE_FILE" up -d midnight-node
+  docker compose -f "$COMPOSE_FILE" stop -t 60 substrate-validator
+  VALIDATOR_IMAGE="$TARGET_IMAGE" docker compose -f "$COMPOSE_FILE" up -d substrate-validator
 
   log "Waiting up to 90s for post-upgrade finality to advance..."
   for _ in $(seq 1 18); do
@@ -91,8 +91,8 @@ perform_upgrade() {
 
   log "ERROR: Finality stalled post-upgrade; triggering rollback."
   if [[ -f "$ROLLBACK_IMAGE_FILE" ]]; then
-    docker compose -f "$COMPOSE_FILE" stop -t 60 midnight-node
-    MIDNIGHT_IMAGE="$(cat "$ROLLBACK_IMAGE_FILE")" docker compose -f "$COMPOSE_FILE" up -d midnight-node
+    docker compose -f "$COMPOSE_FILE" stop -t 60 substrate-validator
+    VALIDATOR_IMAGE="$(cat "$ROLLBACK_IMAGE_FILE")" docker compose -f "$COMPOSE_FILE" up -d substrate-validator
   fi
   die "Upgrade rolled back due to post-upgrade finality stall."
 }
