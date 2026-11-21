@@ -1,0 +1,92 @@
+name: ci
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  go-telemetry:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: telemetry
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+      - name: Vet and race-test telemetry + SLO ETL
+        run: |
+          go vet ./...
+          go test -race -v ./...
+      - name: Build and verify demo ETL report
+        run: |
+          go build -o validator-etl ./cmd/validator-etl
+          ./validator-etl --demo-report
+          ./validator-etl --demo-report --format json >/tmp/report.json
+
+  opentofu-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: "1.8.8"
+      - name: Check formatting
+        run: tofu fmt -check -recursive terraform/
+      - name: Validate testnet environment
+        working-directory: terraform/envs/testnet
+        run: |
+          tofu init -backend=false -input=false
+          tofu validate
+      - name: Validate mainnet environment
+        working-directory: terraform/envs/mainnet
+        run: |
+          tofu init -backend=false -input=false
+          tofu validate
+
+  opa-policy-gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Conftest
+        run: |
+          curl -sSfL https://github.com/open-policy-agent/conftest/releases/download/v0.56.0/conftest_0.56.0_Linux_x86_64.tar.gz | tar xz conftest
+          chmod +x conftest
+      - name: Enforce Terraform validator policies (pass compliant, block insecure)
+        run: |
+          ./conftest test -p policy/terraform_validator.rego --parser hcl2 \
+            terraform/modules/aws-validator/main.tf \
+            terraform/modules/gcp-validator/main.tf \
+            terraform/envs/testnet/main.tf \
+            terraform/envs/mainnet/main.tf
+          ! ./conftest test -p policy/terraform_validator.rego --parser hcl2 terraform/insecure-draft/main.tf
+      - name: Enforce Kubernetes validator policies (pass compliant, block insecure)
+        run: |
+          ./conftest test -p policy/k8s_validator.rego k8s/base/*.yaml
+          ! ./conftest test -p policy/k8s_validator.rego k8s/insecure-draft/bad-validator-pod.yaml
+
+  scripts-and-manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate bash scripts and dry-run logic
+        run: |
+          bash -n bare-metal/scripts/*.sh
+          DRY_RUN=true ./bare-metal/scripts/harden-validator-host.sh
+          DRY_RUN=true ./bare-metal/scripts/rolling-upgrade.sh midnightntwrk/midnight-node:latest
+      - name: Validate all JSON and YAML files
+        run: |
+          python3 -m pip install --quiet pyyaml
+          python3 -c '
+          import glob, json, yaml
+          for f in sorted(glob.glob("**/*.json", recursive=True)):
+              json.load(open(f))
+          for f in sorted(glob.glob("**/*.y*ml", recursive=True)):
+              list(yaml.safe_load_all(open(f)))
+          print("All JSON and YAML manifests parsed cleanly.")
+          '

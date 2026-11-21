@@ -1,0 +1,84 @@
+groups:
+  - name: midnight-validator-slo
+    rules:
+      # 99.99% Monthly SLO = 4.32 minutes error budget over 30 days.
+      # Multi-window fast burn: consumes >5% of monthly budget inside 1h/5m windows.
+      - alert: MidnightValidatorSLOFastBurn
+        expr: |
+          (
+            1 - avg_over_time(midnight_validator_up[1h]) > 0.0014
+          )
+          and
+          (
+            1 - avg_over_time(midnight_validator_up[5m]) > 0.0014
+          )
+        for: 2m
+        labels:
+          severity: critical
+          slo: "99.99"
+        annotations:
+          summary: "Fast 99.99% SLO budget burn on {{ $labels.validator }}"
+          description: "Validator {{ $labels.validator }} ({{ $labels.cloud }}/{{ $labels.operator }}) is burning its 4.32m/month downtime budget rapidly."
+          runbook_url: "docs/runbooks/finality-stall-and-failover.md"
+
+      - alert: MidnightValidatorFinalizedHeadStalled
+        expr: increase(substrate_block_height{status="finalized"}[3m]) == 0
+        for: 3m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Midnight finalized block height stalled on {{ $labels.instance }}"
+          description: "Finalized block height has not incremented in 3 minutes. Verify peers, partner-chain follower, and disk IOPS."
+          runbook_url: "docs/runbooks/finality-stall-and-failover.md"
+
+      - alert: MidnightValidatorFinalityLagHigh
+        expr: |
+          (
+            substrate_block_height{status="best"}
+            - ignoring(status) substrate_block_height{status="finalized"}
+          ) > 10
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High finality lag (>10 blocks) on {{ $labels.instance }}"
+          description: "Best head exceeds finalized head by {{ $value }} blocks."
+
+      - alert: MidnightValidatorLowPeers
+        expr: substrate_sub_libp2p_peers_count < 8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low libp2p peer count (<8) on {{ $labels.instance }}"
+          description: "Validator currently sees only {{ $value }} P2P peers; verify NLB/firewall port 30333 reachability."
+
+      - alert: MidnightValidatorMissedBlockProduction
+        expr: increase(substrate_proposer_block_constructed_count[30m]) == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "No blocks constructed in 30m by {{ $labels.instance }}"
+          description: "Verify Aura/Grandpa session keys are loaded cleanly and validator is in the active set."
+
+      - alert: MidnightValidatorDiskSpaceHigh
+        expr: |
+          (
+            1 - (node_filesystem_avail_bytes{mountpoint="/chain-data"} / node_filesystem_size_bytes{mountpoint="/chain-data"})
+          ) > 0.80
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Chain-state disk usage >80% on {{ $labels.instance }}"
+          description: "Expand KMS-encrypted EBS/PD chain volume before RocksDB stalls."
+
+      - alert: MidnightValidatorClockDriftHigh
+        expr: abs(node_timex_offset_seconds) > 0.100
+        for: 3m
+        labels:
+          severity: critical
+        annotations:
+          summary: "NTP clock drift >100ms on {{ $labels.instance }}"
+          description: "Host clock offset is {{ $value }}s; slot timing requires chrony drift well below 100ms."

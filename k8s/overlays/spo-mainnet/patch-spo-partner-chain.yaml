@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: midnight-node
+  namespace: midnight-validator
+spec:
+  template:
+    metadata:
+      labels:
+        midnight.network/operator: spo
+    spec:
+      containers:
+        - name: midnight-node
+          args:
+            - --validator
+            - --chain=mainnet
+            - --base-path=/chain-data
+            - --port=30333
+            - --rpc-port=9944
+            - --rpc-methods=Safe
+            - --prometheus-port=9615
+            - --prometheus-external
+          env:
+            - name: CARDANO_SECURITY_PARAMETER
+              value: "2160"
+            - name: OGMIOS_URL
+              value: "ws://127.0.0.1:1337"
+          resources:
+            requests:
+              cpu: "8"
+              memory: 32Gi
+            limits:
+              cpu: "16"
+              memory: 64Gi
+        - name: cardano-follower
+          image: ghcr.io/intersectmbo/cardano-node:10.1.4
+          imagePullPolicy: IfNotPresent
+          args:
+            - run
+            - --topology=/config/topology.json
+            - --database-path=/cardano-db
+            - --socket-path=/ipc/node.socket
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: "2"
+              memory: 8Gi
+            limits:
+              cpu: "4"
+              memory: 16Gi
+          startupProbe:
+            exec:
+              command: ["test", "-S", "/ipc/node.socket"]
+            periodSeconds: 10
+            failureThreshold: 60
+          readinessProbe:
+            exec:
+              command: ["test", "-S", "/ipc/node.socket"]
+            periodSeconds: 15
+          livenessProbe:
+            exec:
+              command: ["test", "-S", "/ipc/node.socket"]
+            periodSeconds: 30
+          volumeMounts:
+            - name: cardano-db
+              mountPath: /cardano-db
+            - name: ipc
+              mountPath: /ipc
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: ipc
+          emptyDir: {}
+        - name: cardano-db
+          emptyDir: {}
+  volumeClaimTemplates:
+    - metadata:
+        name: chain-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1000Gi

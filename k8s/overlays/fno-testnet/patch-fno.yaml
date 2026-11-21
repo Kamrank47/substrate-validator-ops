@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: midnight-node
+  namespace: midnight-validator
+spec:
+  template:
+    metadata:
+      labels:
+        midnight.network/operator: fno
+    spec:
+      containers:
+        - name: midnight-node
+          args:
+            - --validator
+            - --chain=testnet
+            - --base-path=/chain-data
+            - --port=30333
+            - --rpc-port=9944
+            - --rpc-methods=Safe
+            - --prometheus-port=9615
+            - --prometheus-external

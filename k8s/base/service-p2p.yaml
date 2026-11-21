@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: midnight-node-p2p
+  namespace: midnight-validator
+  labels:
+    app.kubernetes.io/name: midnight-node
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  selector:
+    app.kubernetes.io/name: midnight-node
+  ports:
+    - name: p2p
+      port: 30333
+      targetPort: p2p
+      protocol: TCP

@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: midnight-validators
+  namespace: argocd
+spec:
+  goTemplate: true
+  generators:
+    - list:
+        elements:
+          - env: dev
+            path: k8s/overlays/dev
+            cluster: https://kubernetes.default.svc
+            autoSync: "true"
+          - env: fno-testnet
+            path: k8s/overlays/fno-testnet
+            cluster: https://eks-fno-eu-west-1.internal
+            autoSync: "true"
+          - env: spo-mainnet
+            path: k8s/overlays/spo-mainnet
+            cluster: https://gke-spo-europe-west3.internal
+            # Manual sync gate for mainnet validators to enforce anti-equivocation checks.
+            autoSync: "false"
+  template:
+    metadata:
+      name: "midnight-{{.env}}"
+    spec:
+      project: midnight-validators
+      source:
+        repoURL: https://github.com/Kamrank47/midnight-validator-platform.git
+        targetRevision: main
+        path: "{{.path}}"
+      destination:
+        server: "{{.cluster}}"
+        namespace: midnight-validator
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true

@@ -1,0 +1,58 @@
+{
+  "title": "Midnight Validator Operations & 99.99% SLO Overview",
+  "uid": "midnight-validator-ops",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "15s",
+  "tags": ["midnight", "blockchain", "validator", "slo"],
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Validator Reachability (1 = Up)",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "targets": [{ "expr": "midnight_validator_up", "refId": "A" }]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "30d Error Budget Remaining (Min @ 99.99%)",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "targets": [{ "expr": "midnight_validator_error_budget_remaining_minutes", "refId": "A" }]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Best vs Finalized Block Height",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "targets": [
+        { "expr": "substrate_block_height{status=\"best\"}", "legendFormat": "Best - {{instance}}", "refId": "A" },
+        { "expr": "substrate_block_height{status=\"finalized\"}", "legendFormat": "Finalized - {{instance}}", "refId": "B" }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Finality Lag & Libp2p Peer Count",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "targets": [
+        { "expr": "midnight_validator_finality_lag", "legendFormat": "Lag - {{validator}}", "refId": "A" },
+        { "expr": "midnight_validator_peers", "legendFormat": "Peers - {{validator}}", "refId": "B" }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "NTP Offset (ms) & Chain Disk Usage (%)",
+      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 12 },
+      "targets": [
+        { "expr": "abs(node_timex_offset_seconds) * 1000", "legendFormat": "Clock Drift ms - {{instance}}", "refId": "A" },
+        { "expr": "(1 - node_filesystem_avail_bytes{mountpoint=\"/chain-data\"} / node_filesystem_size_bytes{mountpoint=\"/chain-data\"}) * 100", "legendFormat": "Disk % - {{instance}}", "refId": "B" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: midnight-node-metrics
+  namespace: midnight-validator
+  labels:
+    app.kubernetes.io/name: midnight-node
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: midnight-node
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s
+      scrapeTimeout: 10s

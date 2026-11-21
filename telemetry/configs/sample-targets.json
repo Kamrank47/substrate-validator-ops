@@ -1,0 +1,26 @@
+{
+  "network": "mainnet",
+  "window_days": 30,
+  "targets": [
+    {
+      "name": "spo-eu-aws-01",
+      "operator_type": "spo",
+      "cloud": "aws",
+      "region": "eu-central-1",
+      "rpc_url": "http://127.0.0.1:9944",
+      "metrics_url": "http://127.0.0.1:9615/metrics",
+      "min_peers": 10,
+      "max_finality_lag": 5
+    },
+    {
+      "name": "fno-eu-gcp-01",
+      "operator_type": "fno",
+      "cloud": "gcp",
+      "region": "europe-west1",
+      "rpc_url": "http://10.52.0.10:9944",
+      "metrics_url": "http://10.52.0.10:9615/metrics",
+      "min_peers": 10,
+      "max_finality_lag": 5
+    }
+  ]
+}

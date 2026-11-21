@@ -1,0 +1,47 @@
+services:
+  midnight-node:
+    image: midnightntwrk/midnight-node:latest
+    container_name: midnight-fno-validator
+    restart: unless-stopped
+    user: "10001:10001"
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    ports:
+      - "30333:30333/tcp"
+      - "127.0.0.1:9944:9944/tcp"
+      - "127.0.0.1:9615:9615/tcp"
+    command:
+      - "--validator"
+      - "--chain=testnet"
+      - "--base-path=/chain-data"
+      - "--port=30333"
+      - "--rpc-port=9944"
+      - "--rpc-methods=Safe"
+      - "--prometheus-port=9615"
+      - "--prometheus-external"
+    volumes:
+      - /var/lib/midnight/chain-data:/chain-data
+      - /etc/midnight/keystore:/keystore:ro
+    tmpfs:
+      - /tmp
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:9615/metrics >/dev/null || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:v1.8.2
+    container_name: midnight-node-exporter
+    restart: unless-stopped
+    network_mode: host
+    pid: host
+    command:
+      - "--path.rootfs=/host"
+      - "--web.listen-address=127.0.0.1:9100"
+    volumes:
+      - /:/host:ro,rslave

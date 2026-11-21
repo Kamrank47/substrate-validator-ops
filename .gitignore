@@ -1,0 +1,18 @@
+# Terraform / OpenTofu
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.out
+.terraform.lock.hcl
+
+# Go build artifacts
+telemetry/bin/
+validator-etl
+coverage.out
+
+# Editor & OS
+.DS_Store
+*.swp
+*.bak
+.env

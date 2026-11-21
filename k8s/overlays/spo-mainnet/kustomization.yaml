@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+namePrefix: spo-
+commonLabels:
+  midnight.network/env: mainnet
+  midnight.network/operator: spo
+patches:
+  - path: patch-spo-partner-chain.yaml

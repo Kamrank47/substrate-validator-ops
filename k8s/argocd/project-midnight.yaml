@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: midnight-validators
+  namespace: argocd
+spec:
+  description: GitOps boundary for Midnight FNO and SPO validator clusters
+  sourceRepos:
+    - https://github.com/Kamrank47/midnight-validator-platform.git
+  destinations:
+    - namespace: midnight-validator
+      server: "*"
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+  namespaceResourceWhitelist:
+    - group: apps
+      kind: StatefulSet
+    - group: ""
+      kind: Service
+    - group: networking.k8s.io
+      kind: NetworkPolicy
+    - group: policy
+      kind: PodDisruptionBudget
+    - group: monitoring.coreos.com
+      kind: ServiceMonitor
