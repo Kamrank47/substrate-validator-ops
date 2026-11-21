@@ -7,8 +7,9 @@
 .terraform.lock.hcl
 
 # Go build artifacts
-telemetry/bin/
-validator-etl
+/telemetry/bin/
+/telemetry/validator-etl
+/validator-etl
 coverage.out
 
 # Editor & OS
